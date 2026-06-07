@@ -7,10 +7,10 @@ function momoUser() {
   console.log("MoMo User Transfer");
   console.log("================================\n");
 
-  let inputpin = prompt("Dial *170#:");
+  let inputpin = prompt("Dial *170*1#:");
   console.clear();
 
-  if (inputpin !== '*170#') {
+  if (inputpin !== '*170*1#') {
     console.log("================================");
     console.log("Incorrect PIN");
     console.log("================================\n");
