@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MoMo Money Transfer - Browser Console</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 0;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 10px;
+            padding: 40px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            text-align: center;
+            max-width: 600px;
+        }
+        
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+        
+        .logo {
+            font-size: 48px;
+            margin-bottom: 20px;
+        }
+        
+        p {
+            color: #666;
+            font-size: 16px;
+            line-height: 1.6;
+            margin: 15px 0;
+        }
+        
+        .instructions {
+            background: #f0f4ff;
+            border-left: 4px solid #667eea;
+            padding: 15px;
+            border-radius: 5px;
+            text-align: left;
+            margin: 20px 0;
+        }
+        
+        .instructions h3 {
+            margin-top: 0;
+            color: #667eea;
+        }
+        
+        .instructions ol {
+            margin: 10px 0;
+            padding-left: 20px;
+        }
+        
+        .instructions li {
+            margin: 8px 0;
+            color: #555;
+        }
+        
+        button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            font-size: 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: transform 0.2s;
+            margin-top: 20px;
+        }
+        
+        button:hover {
+            transform: scale(1.05);
+        }
+        
+        .code {
+            background: #f4f4f4;
+            padding: 8px 12px;
+            border-radius: 3px;
+            font-family: monospace;
+            color: #d63384;
+        }
+        
+        .footer {
+            margin-top: 30px;
+            color: #999;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo">💰</div>
+        <h1>MoMo Money Transfer App</h1>
+        <p>Browser Console Version</p>
+        
+        <div class="instructions">
+            <h3>How to Use:</h3>
+            <ol>
+                <li>Dial *170# to start your transaction<span class="code"></span></li>
+                <li>Your momo pin is 1234</li>
+                <li>Remember you've got GHS 300 in your account</li>
+                           </ol>
+        </div>
+
+
+         <div class="instructions">
+            <h3>More offers await on the MoMo App</h3>
+            <ol>
+  <li>("1) MoMo User</li>
+  <li>("2) Non MoMo User</li>
+  <li>("3) Send with care</li>
+  <li>("4) Favorite</li>
+  <li>("5) Other Network</li>
+  <li>("6) Bank Account</li>
+  
+                           </ol>
+        </div>
+        
+    
+    </div>
+    
+    <script src="momo.js"></script>
+    
+    <script>
+        function openConsole() {
+            alert("Press F12 to open the Developer Console and check the Console tab!");
+        }
+    </script>
+</body>
+</html>
