@@ -1,6 +1,7 @@
 // MoMo Money Transfer Application - Browser Console Version
 
 let balance = 1000.00;
+let bankBalance = 300.00;
 
 function momoUser() {
   console.log("================================");
@@ -30,10 +31,9 @@ function main() {
   console.log("3) Airtime & Bundles");
   console.log("4) Allow cash out");
   console.log("5) Financial");
-  console.log("# for next");
   console.log("================================\n");
 
-  let option = prompt("Enter your choice (1-5 or #):");
+  let option = prompt("Unlock more deals, try our new MoMo App\n1) Transfer Money\n2) MoMoPay & Pay Bill\n3) Airtime & Bundles\n4) Allow cash out\n5) Financial");
 
   if (option === "1") {
     console.clear();
@@ -56,11 +56,9 @@ function moneyTransfer() {
   console.log("4) Favorite");
   console.log("5) Other Network");
   console.log("6) Bank Account");
-  console.log("7) Seven");
-  console.log("# for next");
   console.log("================================\n");
 
-  let moreOffers = prompt("Enter your choice:");
+  let moreOffers = prompt("More offers await on the MoMo App\n1) MoMo User\n2) Non MoMo User\n3) Send with care\n4) Favorite\n5) Other Network\n6) Bank Account\n7) Seven");
 
   console.clear();
 
@@ -220,7 +218,7 @@ function favourite() {
   console.log("0) Back");
   console.log("================================\n");
   
-  const choice = prompt("Enter your choice:");
+  const choice = prompt("Favourite Contacts\n1) Name\n2) Find\n0) Back");
   
   console.clear();
   
@@ -251,7 +249,7 @@ function otherNetwork() {
   console.log("0) Back");
   console.log("================================\n");
   
-  option = prompt("Enter your choice:");
+  option = prompt("Transfer Money To Other Network\n1) AT\n2) Telecel\n3) E-zwich\n4) G-Money\n5) Zeepay\n6) GhanaPay\n0) Back");
   
   console.clear();
   
@@ -325,7 +323,7 @@ function bank() {
   console.log("0) Back");
   console.log("================================\n");
   
-  option = prompt("Enter your choice:");
+  option = prompt("GHIPSS Bank Transfer Service\n1) Wallet to Bank Account\n2) Bank Account to your Wallet\n0) Back");
   
   console.clear();
   
@@ -355,7 +353,7 @@ function walletToBank() {
   console.log("7) ECOBANK");
   console.log("================================\n");
   
-  option = prompt("Enter your choice:");
+  option = prompt("Select Bank\n1) STANCHART\n2) ABSA\n3) GCB\n4) FIDELITY\n5) CAL\n6) ADB\n7) ECOBANK");
   
   console.clear();
   
@@ -405,27 +403,29 @@ function processWalletToBankTransfer(bank) {
     return;
   }
   
-  // Check if total debit (amount+fee+tax) exceeds current balance
+  // Check if total debit (amount+fee+tax) exceeds current mobile money balance
   if (totalAmt > balance) {
     console.log("================================");
     console.log("Insufficient Balance");
-    console.log("You have insufficient money in your account");
+    console.log("You have insufficient money in your mobile wallet");
     console.log("================================");
-    console.log(`Current Balance: GHC ${balance}`);
+    console.log(`Mobile Balance: GHC ${balance.toFixed(2)}`);
     console.log(`Required Amount (incl. fees/tax): GHC ${totalAmt.toFixed(2)}`);
     console.log("================================\n");
     showMenu();
     return;
   }
   
-  // deduct amount and fees/tax from balance
+  // deduct amount and fees/tax from mobile balance, add to bank balance
   balance -= totalAmt;
+  bankBalance += totalAmt;
   const txnId = Math.floor(Math.random() * 1000000);
   console.log("================================");
   console.log("✓ Transaction Successful");
   console.log("================================");
-  console.log(`You have sent an amount of GHC ${amtNum.toFixed(2)} to HAYFORD ASANTE ADDE. Fee: GHC ${feeAmt.toFixed(2)}. Tax: GHC ${taxAmt.toFixed(2)}. Message 2. Your balance is GHC ${balance.toFixed(2)}. Transaction ID: ${txnId}`);
-  console.log(`Via: ${bank}`);
+  console.log(`You have transferred GHC ${amtNum.toFixed(2)} to your bank account. Fee: GHC ${feeAmt.toFixed(2)}. Tax: GHC ${taxAmt.toFixed(2)}. Transaction ID: ${txnId}`);
+  console.log(`Mobile Balance: GHC ${balance.toFixed(2)}`);
+  console.log(`Bank Balance: GHC ${bankBalance.toFixed(2)}`);
   console.log("================================\n");
   
   showMenu();
@@ -445,7 +445,7 @@ function bankToWallet() {
   console.log("7) ECOBANK");
   console.log("================================\n");
   
-  option = prompt("Enter your choice:");
+  option = prompt("Select Bank\n1) STANCHART\n2) ABSA\n3) GCB\n4) FIDELITY\n5) CAL\n6) ADB\n7) ECOBANK");
   
   console.clear();
   
@@ -494,20 +494,21 @@ function processBankToWalletTransfer(bank) {
     return;
   }
   
-  // Check if total debit (amount+fee+tax) exceeds current balance
-  if (totalAmt > balance) {
+  // Check if total debit (amount+fee+tax) exceeds current bank balance
+  if (totalAmt > bankBalance) {
     console.log("================================");
-    console.log("Insufficient Balance");
-    console.log("You have insufficient money in your account");
+    console.log("Insufficient Bank Balance");
+    console.log("You have insufficient funds in your bank account");
     console.log("================================");
-    console.log(`Current Balance: GHC ${balance}`);
+    console.log(`Bank Balance: GHC ${bankBalance.toFixed(2)}`);
     console.log(`Required Amount (incl. fees/tax): GHC ${totalAmt.toFixed(2)}`);
     console.log("================================\n");
     showMenu();
     return;
   }
   
-  balance -= totalAmt;
+  bankBalance -= totalAmt;
+  balance += totalAmt;
   const txnId = Math.floor(Math.random() * 1000000);
   console.log("================================");
   console.log("Account Statement");
@@ -517,7 +518,8 @@ function processBankToWalletTransfer(bank) {
   console.log("Desc: GHC 100");
   console.log("14375983857:Int.PD:01-08-2025");
   console.log("to 29-08-2025");
-  console.log(`Avail Bal: GHC ${balance}`);
+  console.log(`Mobile Balance: GHC ${balance.toFixed(2)}`);
+  console.log(`Bank Balance: GHC ${bankBalance.toFixed(2)}`);
   console.log("Date: 2025-08-29 10:51:46 PM");
   console.log("Transaction ID: " + txnId);
   console.log("================================\n");
