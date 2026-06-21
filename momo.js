@@ -3,6 +3,24 @@
 let balance = 1000.00;
 let bankBalance = 300.00;
 
+function buildPromptMessage(header, details) {
+  return [
+    "================================",
+    header,
+    "================================",
+    ...details,
+    "================================"
+  ].join("\n");
+}
+
+function promptConfirmation(header, details, promptText) {
+  return prompt(`${buildPromptMessage(header, details)}\n${promptText}`);
+}
+
+function promptResult(header, details) {
+  prompt(`${buildPromptMessage(header, details)}\nPress OK to continue`);
+}
+
 function momoUser() {
   console.log("================================");
   console.log("MoMo User Transfer");
@@ -19,7 +37,7 @@ function momoUser() {
     return;
   }
 
-  main();
+  moneyTransfer();
 }
 
 function main() {
@@ -105,17 +123,17 @@ function momoUserTransfer() {
   const feeAmt = amtNum * 0.007;
   const taxAmt = amtNum * 0.01;
   const totalAmt = amtNum + feeAmt + taxAmt;
-  console.log("================================");
-  console.log("Transfer Confirmation");
-  console.log("================================");
-  console.log(`Transfer to HAYFORD ASANTE ADDE for GHC ${amtNum.toFixed(2)}`);
-  console.log(`with reference: ${referens}`);
-  console.log(`Fee is GHC ${feeAmt.toFixed(2)}`);
-  console.log(`Tax amount is GHC ${taxAmt.toFixed(2)}`);
-  console.log(`Total amount is GHC ${totalAmt.toFixed(2)}`);
-  console.log("================================\n");
-  
-  const pin = prompt("Enter PIN (MM) to confirm:");
+  const pin = promptConfirmation(
+    "Transfer Confirmation",
+    [
+      `Transfer to HAYFORD ASANTE ADDE for GHC ${amtNum.toFixed(2)}`,
+      `with reference: ${referens}`,
+      `Fee is GHC ${feeAmt.toFixed(2)}`,
+      `Tax amount is GHC ${taxAmt.toFixed(2)}`,
+      `Total amount is GHC ${totalAmt.toFixed(2)}`
+    ],
+    "Enter PIN (MM) to confirm:"
+  );
   
   console.clear();
   if (pin !== '1234') {
@@ -129,11 +147,16 @@ function momoUserTransfer() {
   // deduct amount and fees/tax from balance
   balance -= totalAmt;
   const txnId = Math.floor(Math.random() * 1000000);
-  console.log("================================");
-  console.log("✓ Transaction Successful");
-  console.log("================================");
-  console.log(`You have sent an amount of GHC ${amtNum.toFixed(2)} to HAYFORD ASANTE ADDE. Fee: GHC ${feeAmt.toFixed(2)}. Tax: GHC ${taxAmt.toFixed(2)}. Message 2. Your balance is GHC ${balance.toFixed(2)}. Transaction ID: ${txnId}`);
-  console.log("================================\n");
+  promptResult(
+    "✓ Transaction Successful",
+    [
+      `You have sent an amount of GHC ${amtNum.toFixed(2)} to HAYFORD ASANTE ADDE.`,
+      `Fee: GHC ${feeAmt.toFixed(2)}`,
+      `Tax: GHC ${taxAmt.toFixed(2)}`,
+      `Your balance is GHC ${balance.toFixed(2)}`,
+      `Transaction ID: ${txnId}`
+    ]
+  );
   
   showMenu();
 }
@@ -157,21 +180,21 @@ function nonMomouser() {
     return;
   }
   
-  console.log("================================");
-  console.log("Transfer Confirmation");
-  console.log("================================");
   const amtNum = parseFloat(amount);
   const feeAmt = amtNum * 0.007;
   const taxAmt = amtNum * 0.01;
   const totalAmt = amtNum + feeAmt + taxAmt;
-  console.log(`Transfer to ${name} for GHC ${amtNum.toFixed(2)}`);
-  console.log(`with reference: ${referens}`);
-  console.log(`Fee is GHC ${feeAmt.toFixed(2)}`);
-  console.log(`Tax amount is GHC ${taxAmt.toFixed(2)}`);
-  console.log(`Total amount is GHC ${totalAmt.toFixed(2)}`);
-  console.log("================================\n");
-  
-  const pin = prompt("Enter PIN (MM) to confirm:");
+  const pin = promptConfirmation(
+    "Transfer Confirmation",
+    [
+      `Transfer to ${name} for GHC ${amtNum.toFixed(2)}`,
+      `with reference: ${referens}`,
+      `Fee is GHC ${feeAmt.toFixed(2)}`,
+      `Tax amount is GHC ${taxAmt.toFixed(2)}`,
+      `Total amount is GHC ${totalAmt.toFixed(2)}`
+    ],
+    "Enter PIN (MM) to confirm:"
+  );
   
   console.clear();
   if (pin !== '1234') {
@@ -185,11 +208,16 @@ function nonMomouser() {
   // deduct amount and fees/tax from balance
   balance -= totalAmt;
   const txnId = Math.floor(Math.random() * 1000000);
-  console.log("================================");
-  console.log("✓ Transaction Successful");
-  console.log("================================");
-  console.log(`You have sent an amount of GHC ${amtNum.toFixed(2)} to ${name}. Fee: GHC ${feeAmt.toFixed(2)}. Tax: GHC ${taxAmt.toFixed(2)}. Message 2. Your balance is GHC ${balance.toFixed(2)}. Transaction ID: ${txnId}`);
-  console.log("================================\n");
+  promptResult(
+    "✓ Transaction Successful",
+    [
+      `You have sent an amount of GHC ${amtNum.toFixed(2)} to ${name}.`,
+      `Fee: GHC ${feeAmt.toFixed(2)}`,
+      `Tax: GHC ${taxAmt.toFixed(2)}`,
+      `Your balance is GHC ${balance.toFixed(2)}`,
+      `Transaction ID: ${txnId}`
+    ]
+  );
   
   showMenu();
 }
@@ -279,18 +307,18 @@ function processOtherNetworkTransfer(network) {
   const feeAmt = amtNum * 0.007;
   const taxAmt = amtNum * 0.01;
   const totalAmt = amtNum + feeAmt + taxAmt;
-  console.log("================================");
-  console.log("Transfer Confirmation");
-  console.log("================================");
-  console.log(`Transfer to HAYFORD ASANTE ADDE for GHC ${amtNum.toFixed(2)}`);
-  console.log(`Network: ${network}`);
-  console.log(`with reference: ${referens}`);
-  console.log(`Fee is GHC ${feeAmt.toFixed(2)}`);
-  console.log(`Tax amount is GHC ${taxAmt.toFixed(2)}`);
-  console.log(`Total amount is GHC ${totalAmt.toFixed(2)}`);
-  console.log("================================\n");
-  
-  const pin = prompt("Enter PIN (MM) to confirm:");
+  const pin = promptConfirmation(
+    "Transfer Confirmation",
+    [
+      `Transfer to HAYFORD ASANTE ADDE for GHC ${amtNum.toFixed(2)}`,
+      `Network: ${network}`,
+      `with reference: ${referens}`,
+      `Fee is GHC ${feeAmt.toFixed(2)}`,
+      `Tax amount is GHC ${taxAmt.toFixed(2)}`,
+      `Total amount is GHC ${totalAmt.toFixed(2)}`
+    ],
+    "Enter PIN (MM) to confirm:"
+  );
   
   console.clear();
   if (pin !== '1234') {
@@ -304,11 +332,16 @@ function processOtherNetworkTransfer(network) {
   // deduct amount and fees/tax from balance
   balance -= totalAmt;
   const txnId = Math.floor(Math.random() * 1000000);
-  console.log("================================");
-  console.log("✓ Transaction Successful");
-  console.log("================================");
-  console.log(`You have sent an amount of GHC ${amtNum.toFixed(2)} to HAYFORD ASANTE ADDE via ${network}. Fee: GHC ${feeAmt.toFixed(2)}. Tax: GHC ${taxAmt.toFixed(2)}. Message 2. Your balance is GHC ${balance.toFixed(2)}. Transaction ID: ${txnId}`);
-  console.log("================================\n");
+  promptResult(
+    "✓ Transaction Successful",
+    [
+      `You have sent an amount of GHC ${amtNum.toFixed(2)} to HAYFORD ASANTE ADDE via ${network}.`,
+      `Fee: GHC ${feeAmt.toFixed(2)}`,
+      `Tax: GHC ${taxAmt.toFixed(2)}`,
+      `Your balance is GHC ${balance.toFixed(2)}`,
+      `Transaction ID: ${txnId}`
+    ]
+  );
   
   showMenu();
 }
@@ -381,18 +414,18 @@ function processWalletToBankTransfer(bank) {
   const feeAmt = amtNum * 0.007;
   const taxAmt = amtNum * 0.01;
   const totalAmt = amtNum + feeAmt + taxAmt;
-  console.log("================================");
-  console.log("Transfer Confirmation");
-  console.log("================================");
-  console.log(`Transfer to HAYFORD ASANTE ADDE for GHC ${amtNum.toFixed(2)}`);
-  console.log(`Bank: ${bank}`);
-  console.log(`with reference: ${referens}`);
-  console.log(`Fee is GHC ${feeAmt.toFixed(2)}`);
-  console.log(`Tax amount is GHC ${taxAmt.toFixed(2)}`);
-  console.log(`Total amount is GHC ${totalAmt.toFixed(2)}`);
-  console.log("================================\n");
-  
-  const pin = prompt("Enter PIN (MM) to confirm:");
+  const pin = promptConfirmation(
+    "Transfer Confirmation",
+    [
+      `Transfer to HAYFORD ASANTE ADDE for GHC ${amtNum.toFixed(2)}`,
+      `Bank: ${bank}`,
+      `with reference: ${referens}`,
+      `Fee is GHC ${feeAmt.toFixed(2)}`,
+      `Tax amount is GHC ${taxAmt.toFixed(2)}`,
+      `Total amount is GHC ${totalAmt.toFixed(2)}`
+    ],
+    "Enter PIN (MM) to confirm:"
+  );
   
   console.clear();
   if (pin !== '1234') {
@@ -420,13 +453,17 @@ function processWalletToBankTransfer(bank) {
   balance -= totalAmt;
   bankBalance += totalAmt;
   const txnId = Math.floor(Math.random() * 1000000);
-  console.log("================================");
-  console.log("✓ Transaction Successful");
-  console.log("================================");
-  console.log(`You have transferred GHC ${amtNum.toFixed(2)} to your bank account. Fee: GHC ${feeAmt.toFixed(2)}. Tax: GHC ${taxAmt.toFixed(2)}. Transaction ID: ${txnId}`);
-  console.log(`Mobile Balance: GHC ${balance.toFixed(2)}`);
-  console.log(`Bank Balance: GHC ${bankBalance.toFixed(2)}`);
-  console.log("================================\n");
+  promptResult(
+    "✓ Transaction Successful",
+    [
+      `You have transferred GHC ${amtNum.toFixed(2)} to your bank account.`,
+      `Fee: GHC ${feeAmt.toFixed(2)}`,
+      `Tax: GHC ${taxAmt.toFixed(2)}`,
+      `Mobile Balance: GHC ${balance.toFixed(2)}`,
+      `Bank Balance: GHC ${bankBalance.toFixed(2)}`,
+      `Transaction ID: ${txnId}`
+    ]
+  );
   
   showMenu();
 }
@@ -510,19 +547,20 @@ function processBankToWalletTransfer(bank) {
   bankBalance -= totalAmt;
   balance += totalAmt;
   const txnId = Math.floor(Math.random() * 1000000);
-  console.log("================================");
-  console.log("Account Statement");
-  console.log("================================");
-  console.log("Acct: 1*******4582");
-  console.log(`Amt: GHC ${amount} CR`);
-  console.log("Desc: GHC 100");
-  console.log("14375983857:Int.PD:01-08-2025");
-  console.log("to 29-08-2025");
-  console.log(`Mobile Balance: GHC ${balance.toFixed(2)}`);
-  console.log(`Bank Balance: GHC ${bankBalance.toFixed(2)}`);
-  console.log("Date: 2025-08-29 10:51:46 PM");
-  console.log("Transaction ID: " + txnId);
-  console.log("================================\n");
+  promptResult(
+    "Account Statement",
+    [
+      "Acct: 1*******4582",
+      `Amt: GHC ${amount} CR`,
+      "Desc: GHC 100",
+      "14375983857:Int.PD:01-08-2025",
+      "to 29-08-2025",
+      `Mobile Balance: GHC ${balance.toFixed(2)}`,
+      `Bank Balance: GHC ${bankBalance.toFixed(2)}`,
+      "Date: 2025-08-29 10:51:46 PM",
+      `Transaction ID: ${txnId}`
+    ]
+  );
   
   showMenu();
 }
@@ -542,7 +580,7 @@ function showMenu() {
   const continueChoice = prompt("1) Menu  2) Exit");
   
   if (continueChoice === "1") {
-    main();
+    moneyTransfer();
   } else if (continueChoice === "2") {
     console.clear();
     console.log("================================");
@@ -550,7 +588,7 @@ function showMenu() {
     console.log("Thank you for using MoMo App!");
     console.log("================================");
   } else {
-    main();
+    moneyTransfer();
   }
 }
 
