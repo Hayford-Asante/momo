@@ -1,602 +1,683 @@
-// MoMo Money Transfer Application - Browser Console Version
+let balance = 1000.0;
+let bankBalance = 300.0;
 
-let balance = 1000.00;
-let bankBalance = 300.00;
+const ui = {
+  status: document.getElementById("status"),
+  menu: document.getElementById("menu"),
+  form: document.getElementById("action-form"),
+  fields: document.getElementById("form-fields"),
+  submitButton: document.getElementById("submit-btn"),
+  backButton: document.getElementById("back-btn"),
+  mobileBalance: document.getElementById("mobile-balance"),
+  bankBalance: document.getElementById("bank-balance"),
+};
 
-function buildPromptMessage(header, details) {
-  return [
-    "================================",
-    header,
-    "================================",
-    ...details,
-    "================================"
-  ].join("\n");
+let currentAction = null;
+
+function init() {
+  ui.form.addEventListener("submit", handleFormSubmit);
+  ui.backButton.addEventListener("click", () => {
+    if (currentAction === "main") {
+      main();
+    } else {
+      moneyTransfer();
+    }
+  });
+  updateBalances();
+  main();
 }
 
-function promptConfirmation(header, details, promptText) {
-  return prompt(`${buildPromptMessage(header, details)}\n${promptText}`);
+function updateBalances() {
+  ui.mobileBalance.textContent = `GHC ${balance.toFixed(2)}`;
+  ui.bankBalance.textContent = `GHC ${bankBalance.toFixed(2)}`;
 }
 
-function promptResult(header, details) {
-  prompt(`${buildPromptMessage(header, details)}\nPress OK to continue`);
+function showStatus(title, details, type = "info") {
+  const detailItems = details.map((detail) => `<li>${detail}</li>`).join("");
+  ui.status.innerHTML = `
+    <div class="status-card ${type}">
+      <h3>${title}</h3>
+      <ul>${detailItems}</ul>
+    </div>
+  `;
 }
 
-function momoUser() {
-  console.log("================================");
-  console.log("MoMo User Transfer");
-  console.log("================================\n");
+function renderMenu(buttons) {
+  ui.menu.innerHTML = buttons
+    .map(
+      (button) => `
+    <button type="button" class="menu-btn" data-action="${button.action}">
+      ${button.label}
+    </button>
+  `,
+    )
+    .join("");
 
-  let inputpin = prompt("Dial *170*1#:");
-  console.clear();
+  ui.menu.querySelectorAll("[data-action]").forEach((button) => {
+    button.addEventListener(
+      "click",
+      () => button.dataset.action && window[button.dataset.action](),
+    );
+  });
+}
 
-  if (inputpin !== '*170*1#') {
-    console.log("================================");
-    console.log("Incorrect PIN");
-    console.log("================================\n");
-    momoUser();
-    return;
+function renderForm(title, fields, actionName, submitLabel = "Continue") {
+  currentAction = actionName || "custom";
+  ui.form.dataset.active = currentAction;
+  ui.submitButton.textContent = submitLabel;
+  ui.fields.innerHTML = `
+    <h3>${title}</h3>
+    ${fields
+      .map(
+        (field) => `
+      <label>
+        <span>${field.label}</span>
+        <input type="${field.type || "text"}" name="${field.name}" ${field.placeholder ? `placeholder="${field.placeholder}"` : ""} ${field.step ? `step="${field.step}"` : ""} ${field.required ? "required" : ""} />
+      </label>
+    `,
+      )
+      .join("")}
+  `;
+}
+
+function handleFormSubmit(event) {
+  event.preventDefault();
+  const formData = new FormData(ui.form);
+  const values = Object.fromEntries(formData.entries());
+
+  if (currentAction === "momoUserTransfer") {
+    handleMomoTransfer(values);
+  } else if (currentAction === "nonMomouser") {
+    handleNonMomoTransfer(values);
+  } else if (currentAction === "otherNetworkTransfer") {
+    handleOtherNetworkTransfer(values);
+  } else if (currentAction === "walletToBankTransfer") {
+    handleWalletToBankTransfer(values);
+  } else if (currentAction === "bankToWalletTransfer") {
+    handleBankToWalletTransfer(values);
+  } else if (currentAction === "favourite") {
+    handleFavourite(values);
   }
-
-  moneyTransfer();
 }
 
 function main() {
-  console.clear();
-  console.log("================================");
-  console.log("Unlock more deals, try our new MoMo App");
-  console.log("1) Transfer Money");
-  console.log("2) MoMoPay & Pay Bill");
-  console.log("3) Airtime & Bundles");
-  console.log("4) Allow cash out");
-  console.log("5) Financial");
-  console.log("================================\n");
-
-  let option = prompt("Unlock more deals, try our new MoMo App\n1) Transfer Money\n2) MoMoPay & Pay Bill\n3) Airtime & Bundles\n4) Allow cash out\n5) Financial");
-
-  if (option === "1") {
-    console.clear();
-    moneyTransfer();
-  } else {
-    console.clear();
-    console.log("Unknown Input");
-    console.log("Redirecting to main menu...\n");
-    setTimeout(main, 2000);
-  }
+  currentAction = "main";
+  showStatus("Unlock more deals, try our new MoMo App", [
+    "Transfer Money",
+    "MoMoPay & Pay Bill",
+    "Airtime & Bundles",
+    "Allow cash out",
+    "Financial",
+  ]);
+  renderMenu([
+    { label: "Transfer Money", action: "moneyTransfer" },
+    { label: "MoMoPay & Pay Bill", action: "showComingSoon" },
+    { label: "Airtime & Bundles", action: "showComingSoon" },
+    { label: "Allow cash out", action: "showComingSoon" },
+    { label: "Financial", action: "showComingSoon" },
+  ]);
+  ui.fields.innerHTML = "";
 }
 
 function moneyTransfer() {
-  console.clear();
-  console.log("================================");
-  console.log("More offers await on the MoMo App");
-  console.log("1) MoMo User");
-  console.log("2) Non MoMo User");
-  console.log("3) Send with care");
-  console.log("4) Favorite");
-  console.log("5) Other Network");
-  console.log("6) Bank Account");
-  console.log("================================\n");
-
-  let moreOffers = prompt("More offers await on the MoMo App\n1) MoMo User\n2) Non MoMo User\n3) Send with care\n4) Favorite\n5) Other Network\n6) Bank Account\n7) Seven");
-
-  console.clear();
-
-  switch (moreOffers) {
-    case "1":
-      momoUserTransfer();
-      break;
-    case "2":
-      nonMomouser();
-      break;
-    case "3":
-      sendWithcare();
-      break;
-    case "4":
-      favourite();
-      break;
-    case "5":
-      otherNetwork();
-      break;
-    case "6":
-      bank();
-      break;
-    case "7":
-      seven();
-      break;
-    default:
-      console.log("Unknown Input");
-      console.log("Redirecting to main menu...\n");
-      setTimeout(main, 2000);
-  }
+  currentAction = "moneyTransfer";
+  showStatus("More offers await on the MoMo App", [
+    "MoMo User",
+    "Non MoMo User",
+    "Send with care",
+    "Favorite",
+    "Other Network",
+    "Bank Account",
+    "Seven",
+  ]);
+  renderMenu([
+    { label: "MoMo User", action: "momoUserTransfer" },
+    { label: "Non MoMo User", action: "nonMomouser" },
+    { label: "Send with care", action: "sendWithcare" },
+    { label: "Favorite", action: "favourite" },
+    { label: "Other Network", action: "otherNetwork" },
+    { label: "Bank Account", action: "bank" },
+    { label: "Seven", action: "seven" },
+  ]);
+  ui.fields.innerHTML = "";
 }
 
 function momoUserTransfer() {
-  console.log("================================");
-  console.log("MoMo User Transfer");
-  console.log("================================\n");
-  
-  const number = prompt("Enter Mobile Number:");
-  const amount = prompt("Enter Amount (GHC):");
-  const referens = prompt("Enter Reference:");
-  
-  console.clear();
-  const amtNum = parseFloat(amount);
-  const feeAmt = amtNum * 0.007;
-  const taxAmt = amtNum * 0.01;
-  const totalAmt = amtNum + feeAmt + taxAmt;
-  const pin = promptConfirmation(
-    "Transfer Confirmation",
+  renderForm(
+    "MoMo User Transfer",
     [
-      `Transfer to HAYFORD ASANTE ADDE for GHC ${amtNum.toFixed(2)}`,
-      `with reference: ${referens}`,
-      `Fee is GHC ${feeAmt.toFixed(2)}`,
-      `Tax amount is GHC ${taxAmt.toFixed(2)}`,
-      `Total amount is GHC ${totalAmt.toFixed(2)}`
+      { label: "Enter Mobile Number", name: "number", type: "tel" },
+      {
+        label: "Enter Amount (GHC)",
+        name: "amount",
+        type: "number",
+        step: "0.01",
+      },
+      { label: "Enter Reference", name: "reference", type: "text" },
+      { label: "Enter PIN (MM) to confirm", name: "pin", type: "password" },
     ],
-    "Enter PIN (MM) to confirm:"
+    "momoUserTransfer",
   );
-  
-  console.clear();
-  if (pin !== '1234') {
-    console.log("================================");
-    console.log("Incorrect PIN");
-    console.log("================================\n");
-    showMenu();
+  showStatus("MoMo User Transfer", [
+    "Please enter the transfer details below.",
+  ]);
+}
+
+function handleMomoTransfer(data) {
+  const amount = parseFloat(data.amount);
+  if (!amount || amount <= 0) {
+    showStatus(
+      "Invalid Amount",
+      ["Please enter a valid amount greater than zero."],
+      "error",
+    );
     return;
   }
-  
-  // deduct amount and fees/tax from balance
+
+  if (data.pin !== "1234") {
+    showStatus("Incorrect PIN", ["The PIN you entered is incorrect."], "error");
+    return;
+  }
+
+  const feeAmt = amount * 0.007;
+  const taxAmt = amount * 0.01;
+  const totalAmt = amount + feeAmt + taxAmt;
+
+  if (totalAmt > balance) {
+    showStatus(
+      "Insufficient Balance",
+      [
+        `Your mobile wallet balance is GHC ${balance.toFixed(2)}`,
+        `The transfer needs GHC ${totalAmt.toFixed(2)}`,
+      ],
+      "error",
+    );
+    return;
+  }
+
   balance -= totalAmt;
+  updateBalances();
   const txnId = Math.floor(Math.random() * 1000000);
-  promptResult(
+  showStatus(
     "✓ Transaction Successful",
     [
-      `You have sent an amount of GHC ${amtNum.toFixed(2)} to HAYFORD ASANTE ADDE.`,
+      `You have sent GHC ${amount.toFixed(2)} to HAYFORD ASANTE ADDE.`,
       `Fee: GHC ${feeAmt.toFixed(2)}`,
       `Tax: GHC ${taxAmt.toFixed(2)}`,
       `Your balance is GHC ${balance.toFixed(2)}`,
-      `Transaction ID: ${txnId}`
-    ]
+      `Transaction ID: ${txnId}`,
+    ],
+    "success",
   );
-  
-  showMenu();
+  renderMenu([
+    { label: "Back to Transfer Menu", action: "moneyTransfer" },
+    { label: "Back to Main Menu", action: "main" },
+  ]);
 }
 
 function nonMomouser() {
-  console.log("================================");
-  console.log("Non MoMo User Transfer");
-  console.log("================================\n");
-  
-  const name = prompt("Enter receiver Name:");
-  const amount = prompt("Enter Amount:");
-  const referens = prompt("Enter Reference:");
-  const secretCode1 = prompt("Enter Secret Code:");
-  const secretCode2 = prompt("Confirm Secret Code:");
-  
-  console.clear();
-  
-  if (secretCode1 !== secretCode2) {
-    console.log("Invalid Input - Secret codes do not match!");
-    setTimeout(nonMomouser, 2000);
-    return;
-  }
-  
-  const amtNum = parseFloat(amount);
-  const feeAmt = amtNum * 0.007;
-  const taxAmt = amtNum * 0.01;
-  const totalAmt = amtNum + feeAmt + taxAmt;
-  const pin = promptConfirmation(
-    "Transfer Confirmation",
+  renderForm(
+    "Non MoMo User Transfer",
     [
-      `Transfer to ${name} for GHC ${amtNum.toFixed(2)}`,
-      `with reference: ${referens}`,
-      `Fee is GHC ${feeAmt.toFixed(2)}`,
-      `Tax amount is GHC ${taxAmt.toFixed(2)}`,
-      `Total amount is GHC ${totalAmt.toFixed(2)}`
+      { label: "Enter receiver Name", name: "name", type: "text" },
+      { label: "Enter Amount", name: "amount", type: "number", step: "0.01" },
+      { label: "Enter Reference", name: "reference", type: "text" },
+      { label: "Enter Secret Code", name: "secretCode1", type: "password" },
+      { label: "Confirm Secret Code", name: "secretCode2", type: "password" },
+      { label: "Enter PIN (MM) to confirm", name: "pin", type: "password" },
     ],
-    "Enter PIN (MM) to confirm:"
+    "nonMomouser",
   );
-  
-  console.clear();
-  if (pin !== '1234') {
-    console.log("================================");
-    console.log("Incorrect PIN");
-    console.log("================================\n");
-    showMenu();
+  showStatus("Non MoMo User Transfer", [
+    "Please fill in the details to continue.",
+  ]);
+}
+
+function handleNonMomoTransfer(data) {
+  if (data.secretCode1 !== data.secretCode2) {
+    showStatus("Invalid Input", ["The secret codes do not match."], "error");
     return;
   }
-  
-  // deduct amount and fees/tax from balance
+
+  const amount = parseFloat(data.amount);
+  if (!amount || amount <= 0) {
+    showStatus(
+      "Invalid Amount",
+      ["Please enter a valid amount greater than zero."],
+      "error",
+    );
+    return;
+  }
+
+  if (data.pin !== "1234") {
+    showStatus("Incorrect PIN", ["The PIN you entered is incorrect."], "error");
+    return;
+  }
+
+  const feeAmt = amount * 0.007;
+  const taxAmt = amount * 0.01;
+  const totalAmt = amount + feeAmt + taxAmt;
   balance -= totalAmt;
+  updateBalances();
   const txnId = Math.floor(Math.random() * 1000000);
-  promptResult(
+  showStatus(
     "✓ Transaction Successful",
     [
-      `You have sent an amount of GHC ${amtNum.toFixed(2)} to ${name}.`,
+      `You have sent GHC ${amount.toFixed(2)} to ${data.name}.`,
       `Fee: GHC ${feeAmt.toFixed(2)}`,
       `Tax: GHC ${taxAmt.toFixed(2)}`,
       `Your balance is GHC ${balance.toFixed(2)}`,
-      `Transaction ID: ${txnId}`
-    ]
+      `Transaction ID: ${txnId}`,
+    ],
+    "success",
   );
-  
-  showMenu();
+  renderMenu([
+    { label: "Back to Transfer Menu", action: "moneyTransfer" },
+    { label: "Back to Main Menu", action: "main" },
+  ]);
 }
 
 function sendWithcare() {
-  console.clear();
-  console.log("================================");
-  console.log("Send With Care (SwC) Service");
-  console.log("================================\n");
-  console.log("The SwC product will be unavailable till");
-  console.log("30/06/2026. To view your caretaker, beneficiary,");
-  console.log("balances or claims, please use WhatsApp on");
-  console.log("0243486849");
-  console.log("================================\n");
-  
-  showMenu();
+  showStatus(
+    "Send With Care (SwC)",
+    [
+      "The SwC product will be unavailable till 30/06/2026.",
+      "To view your caretaker, beneficiary, balances or claims, please use WhatsApp on 0243486849.",
+    ],
+    "info",
+  );
+  ui.fields.innerHTML = "";
+  renderMenu([
+    { label: "Back to Transfer Menu", action: "moneyTransfer" },
+    { label: "Back to Main Menu", action: "main" },
+  ]);
 }
 
 function favourite() {
-  console.clear();
-  console.log("================================");
-  console.log("Favourite Contacts");
-  console.log("================================");
-  console.log("1) Name");
-  console.log("2) Find");
-  console.log("0) Back");
-  console.log("================================\n");
-  
-  const choice = prompt("Favourite Contacts\n1) Name\n2) Find\n0) Back");
-  
-  console.clear();
-  
-  if (choice === "1" || choice === "2") {
-    const name = prompt("Enter Name:");
-    const pin = prompt("Enter Pin:");
-    
-    console.clear();
-    console.log("================================");
-    console.log("No contact found");
-    console.log("================================\n");
+  renderForm(
+    "Favourite Contacts",
+    [
+      { label: "Enter Name", name: "name", type: "text" },
+      { label: "Enter PIN", name: "pin", type: "password" },
+    ],
+    "favourite",
+  );
+  showStatus("Favourite Contacts", ["Enter a name and PIN to search."]);
+}
+
+function handleFavourite(data) {
+  if (data.pin !== "1234") {
+    showStatus("Incorrect PIN", ["The PIN you entered is incorrect."], "error");
+    return;
   }
-  
-  showMenu();
+  showStatus(
+    "No contact found",
+    [`No contact was found for ${data.name || "that entry"}.`],
+    "info",
+  );
+  renderMenu([
+    { label: "Back to Transfer Menu", action: "moneyTransfer" },
+    { label: "Back to Main Menu", action: "main" },
+  ]);
 }
 
 function otherNetwork() {
-  console.clear();
-  console.log("================================");
-  console.log("Transfer Money To Other Network");
-  console.log("================================");
-  console.log("1) AT");
-  console.log("2) Telecel");
-  console.log("3) E-zwich");
-  console.log("4) G-Money");
-  console.log("5) Zeepay");
-  console.log("6) GhanaPay");
-  console.log("0) Back");
-  console.log("================================\n");
-  
-  option = prompt("Transfer Money To Other Network\n1) AT\n2) Telecel\n3) E-zwich\n4) G-Money\n5) Zeepay\n6) GhanaPay\n0) Back");
-  
-  console.clear();
-  
-  const networks = ["AT", "Telecel", "E-zwich", "G-Money", "Zeepay", "GhanaPay"];
-  
-  if (option >= "1" && option <= "6") {
-    processOtherNetworkTransfer(networks[parseInt(option) - 1]);
-  } else if (option === "0") {
-    main();
-  } else {
-    console.log("Unknown Input");
-    setTimeout(otherNetwork, 2000);
-  }
+  currentAction = "otherNetwork";
+  showStatus("Transfer Money To Other Network", ["Choose a network below."]);
+  renderMenu([
+    { label: "AT", action: "selectNetworkAT" },
+    { label: "Telecel", action: "selectNetworkTelecel" },
+    { label: "E-zwich", action: "selectNetworkEzwich" },
+    { label: "G-Money", action: "selectNetworkGMoney" },
+    { label: "Zeepay", action: "selectNetworkZeepay" },
+    { label: "GhanaPay", action: "selectNetworkGhanaPay" },
+    { label: "Back", action: "moneyTransfer" },
+  ]);
+  ui.fields.innerHTML = "";
+}
+
+function selectNetworkAT() {
+  processOtherNetworkTransfer("AT");
+}
+function selectNetworkTelecel() {
+  processOtherNetworkTransfer("Telecel");
+}
+function selectNetworkEzwich() {
+  processOtherNetworkTransfer("E-zwich");
+}
+function selectNetworkGMoney() {
+  processOtherNetworkTransfer("G-Money");
+}
+function selectNetworkZeepay() {
+  processOtherNetworkTransfer("Zeepay");
+}
+function selectNetworkGhanaPay() {
+  processOtherNetworkTransfer("GhanaPay");
 }
 
 function processOtherNetworkTransfer(network) {
-  console.log("================================");
-  console.log(`${network} Transfer`);
-  console.log("================================\n");
-  
-  const number = prompt("Enter Mobile Number:");
-  const amount = prompt("Enter Amount (GHC):");
-  const referens = prompt("Enter Reference:");
-  
-  console.clear();
-  const amtNum = parseFloat(amount);
-  const feeAmt = amtNum * 0.007;
-  const taxAmt = amtNum * 0.01;
-  const totalAmt = amtNum + feeAmt + taxAmt;
-  const pin = promptConfirmation(
-    "Transfer Confirmation",
+  renderForm(
+    `${network} Transfer`,
     [
-      `Transfer to HAYFORD ASANTE ADDE for GHC ${amtNum.toFixed(2)}`,
-      `Network: ${network}`,
-      `with reference: ${referens}`,
-      `Fee is GHC ${feeAmt.toFixed(2)}`,
-      `Tax amount is GHC ${taxAmt.toFixed(2)}`,
-      `Total amount is GHC ${totalAmt.toFixed(2)}`
+      { label: "Enter Mobile Number", name: "number", type: "tel" },
+      {
+        label: "Enter Amount (GHC)",
+        name: "amount",
+        type: "number",
+        step: "0.01",
+      },
+      { label: "Enter Reference", name: "reference", type: "text" },
+      { label: "Enter PIN (MM) to confirm", name: "pin", type: "password" },
     ],
-    "Enter PIN (MM) to confirm:"
+    "otherNetworkTransfer",
   );
-  
-  console.clear();
-  if (pin !== '1234') {
-    console.log("================================");
-    console.log("Incorrect PIN");
-    console.log("================================\n");
-    showMenu();
+  currentAction = "otherNetworkTransfer";
+  showStatus(`${network} Transfer`, ["Enter the transfer details below."]);
+  ui.form.dataset.network = network;
+}
+
+function handleOtherNetworkTransfer(data) {
+  const network = ui.form.dataset.network || "Other Network";
+  const amount = parseFloat(data.amount);
+  if (!amount || amount <= 0) {
+    showStatus(
+      "Invalid Amount",
+      ["Please enter a valid amount greater than zero."],
+      "error",
+    );
     return;
   }
-  
-  // deduct amount and fees/tax from balance
+
+  if (data.pin !== "1234") {
+    showStatus("Incorrect PIN", ["The PIN you entered is incorrect."], "error");
+    return;
+  }
+
+  const feeAmt = amount * 0.007;
+  const taxAmt = amount * 0.01;
+  const totalAmt = amount + feeAmt + taxAmt;
   balance -= totalAmt;
+  updateBalances();
   const txnId = Math.floor(Math.random() * 1000000);
-  promptResult(
+  showStatus(
     "✓ Transaction Successful",
     [
-      `You have sent an amount of GHC ${amtNum.toFixed(2)} to HAYFORD ASANTE ADDE via ${network}.`,
+      `You have sent GHC ${amount.toFixed(2)} to HAYFORD ASANTE ADDE via ${network}.`,
       `Fee: GHC ${feeAmt.toFixed(2)}`,
       `Tax: GHC ${taxAmt.toFixed(2)}`,
       `Your balance is GHC ${balance.toFixed(2)}`,
-      `Transaction ID: ${txnId}`
-    ]
+      `Transaction ID: ${txnId}`,
+    ],
+    "success",
   );
-  
-  showMenu();
+  renderMenu([
+    { label: "Back to Transfer Menu", action: "moneyTransfer" },
+    { label: "Back to Main Menu", action: "main" },
+  ]);
 }
 
 function bank() {
-  console.clear();
-  console.log("================================");
-  console.log("GHIPSS Bank Transfer Service");
-  console.log("================================");
-  console.log("1) Wallet to Bank Account");
-  console.log("2) Bank Account to your Wallet");
-  console.log("0) Back");
-  console.log("================================\n");
-  
-  option = prompt("GHIPSS Bank Transfer Service\n1) Wallet to Bank Account\n2) Bank Account to your Wallet\n0) Back");
-  
-  console.clear();
-  
-  if (option === "1") {
-    walletToBank();
-  } else if (option === "2") {
-    bankToWallet();
-  } else if (option === "0") {
-    main();
-  } else {
-    console.log("Unknown Input");
-    setTimeout(bank, 2000);
-  }
+  showStatus("GHIPSS Bank Transfer Service", [
+    "Choose a transfer direction below.",
+  ]);
+  renderMenu([
+    { label: "Wallet to Bank Account", action: "walletToBank" },
+    { label: "Bank Account to your Wallet", action: "bankToWallet" },
+    { label: "Back", action: "moneyTransfer" },
+  ]);
+  ui.fields.innerHTML = "";
 }
 
 function walletToBank() {
-  console.clear();
-  console.log("================================");
-  console.log("Select Bank");
-  console.log("================================");
-  console.log("1) STANCHART");
-  console.log("2) ABSA");
-  console.log("3) GCB");
-  console.log("4) FIDELITY");
-  console.log("5) CAL");
-  console.log("6) ADB");
-  console.log("7) ECOBANK");
-  console.log("================================\n");
-  
-  option = prompt("Select Bank\n1) STANCHART\n2) ABSA\n3) GCB\n4) FIDELITY\n5) CAL\n6) ADB\n7) ECOBANK");
-  
-  console.clear();
-  
-  const banks = ["STANCHART", "ABSA", "GCB", "FIDELITY", "CAL", "ADB", "ECOBANK"];
-  
-  if (option >= "1" && option <= "7") {
-    processWalletToBankTransfer(banks[parseInt(option) - 1]);
-  } else {
-    console.log("Unknown Input");
-    setTimeout(walletToBank, 2000);
-  }
+  currentAction = "walletToBank";
+  showStatus("Select Bank", ["Choose your bank below."]);
+  renderMenu([
+    { label: "STANCHART", action: "selectBankStanchart" },
+    { label: "ABSA", action: "selectBankAbsa" },
+    { label: "GCB", action: "selectBankGcb" },
+    { label: "FIDELITY", action: "selectBankFidelity" },
+    { label: "CAL", action: "selectBankCal" },
+    { label: "ADB", action: "selectBankAdb" },
+    { label: "ECOBANK", action: "selectBankEcobank" },
+  ]);
+  ui.fields.innerHTML = "";
+}
+
+function selectBankStanchart() {
+  processWalletToBankTransfer("STANCHART");
+}
+function selectBankAbsa() {
+  processWalletToBankTransfer("ABSA");
+}
+function selectBankGcb() {
+  processWalletToBankTransfer("GCB");
+}
+function selectBankFidelity() {
+  processWalletToBankTransfer("FIDELITY");
+}
+function selectBankCal() {
+  processWalletToBankTransfer("CAL");
+}
+function selectBankAdb() {
+  processWalletToBankTransfer("ADB");
+}
+function selectBankEcobank() {
+  processWalletToBankTransfer("ECOBANK");
 }
 
 function processWalletToBankTransfer(bank) {
-  console.log("================================");
-  console.log(`${bank} - Wallet to Bank Transfer`);
-  console.log("================================\n");
-  
-  const accountNumber = prompt("Enter Bank Account Number:");
-  const amount = prompt("Enter Amount to Transfer:");
-  const referens = prompt("Enter Reference ID:");
-  
-  console.clear();
-  const amtNum = parseFloat(amount);
-  const feeAmt = amtNum * 0.007;
-  const taxAmt = amtNum * 0.01;
-  const totalAmt = amtNum + feeAmt + taxAmt;
-  const pin = promptConfirmation(
-    "Transfer Confirmation",
+  renderForm(
+    `${bank} Transfer`,
     [
-      `Transfer to HAYFORD ASANTE ADDE for GHC ${amtNum.toFixed(2)}`,
-      `Bank: ${bank}`,
-      `with reference: ${referens}`,
-      `Fee is GHC ${feeAmt.toFixed(2)}`,
-      `Tax amount is GHC ${taxAmt.toFixed(2)}`,
-      `Total amount is GHC ${totalAmt.toFixed(2)}`
+      {
+        label: "Enter Bank Account Number",
+        name: "accountNumber",
+        type: "text",
+      },
+      {
+        label: "Enter Amount to Transfer",
+        name: "amount",
+        type: "number",
+        step: "0.01",
+      },
+      { label: "Enter Reference ID", name: "reference", type: "text" },
+      { label: "Enter PIN (MM) to confirm", name: "pin", type: "password" },
     ],
-    "Enter PIN (MM) to confirm:"
+    "walletToBankTransfer",
   );
-  
-  console.clear();
-  if (pin !== '1234') {
-    console.log("================================");
-    console.log("Incorrect PIN");
-    console.log("================================\n");
-    showMenu();
+  currentAction = "walletToBankTransfer";
+  showStatus(`${bank} - Wallet to Bank Transfer`, [
+    "Enter your bank transfer details below.",
+  ]);
+  ui.form.dataset.bank = bank;
+}
+
+function handleWalletToBankTransfer(data) {
+  const bank = ui.form.dataset.bank || "Selected Bank";
+  const amount = parseFloat(data.amount);
+  if (!amount || amount <= 0) {
+    showStatus(
+      "Invalid Amount",
+      ["Please enter a valid amount greater than zero."],
+      "error",
+    );
     return;
   }
-  
-  // Check if total debit (amount+fee+tax) exceeds current mobile money balance
+  if (data.pin !== "1234") {
+    showStatus("Incorrect PIN", ["The PIN you entered is incorrect."], "error");
+    return;
+  }
+
+  const feeAmt = amount * 0.007;
+  const taxAmt = amount * 0.01;
+  const totalAmt = amount + feeAmt + taxAmt;
   if (totalAmt > balance) {
-    console.log("================================");
-    console.log("Insufficient Balance");
-    console.log("You have insufficient money in your mobile wallet");
-    console.log("================================");
-    console.log(`Mobile Balance: GHC ${balance.toFixed(2)}`);
-    console.log(`Required Amount (incl. fees/tax): GHC ${totalAmt.toFixed(2)}`);
-    console.log("================================\n");
-    showMenu();
+    showStatus(
+      "Insufficient Balance",
+      [
+        `Your mobile wallet balance is GHC ${balance.toFixed(2)}`,
+        `The transfer needs GHC ${totalAmt.toFixed(2)}`,
+      ],
+      "error",
+    );
     return;
   }
-  
-  // deduct amount and fees/tax from mobile balance, add to bank balance
+
   balance -= totalAmt;
   bankBalance += totalAmt;
+  updateBalances();
   const txnId = Math.floor(Math.random() * 1000000);
-  promptResult(
+  showStatus(
     "✓ Transaction Successful",
     [
-      `You have transferred GHC ${amtNum.toFixed(2)} to your bank account.`,
+      `You have transferred GHC ${amount.toFixed(2)} to your bank account.`,
+      `Bank: ${bank}`,
       `Fee: GHC ${feeAmt.toFixed(2)}`,
       `Tax: GHC ${taxAmt.toFixed(2)}`,
       `Mobile Balance: GHC ${balance.toFixed(2)}`,
       `Bank Balance: GHC ${bankBalance.toFixed(2)}`,
-      `Transaction ID: ${txnId}`
-    ]
+      `Transaction ID: ${txnId}`,
+    ],
+    "success",
   );
-  
-  showMenu();
+  renderMenu([
+    { label: "Back to Transfer Menu", action: "moneyTransfer" },
+    { label: "Back to Main Menu", action: "main" },
+  ]);
 }
 
 function bankToWallet() {
-  console.clear();
-  console.log("================================");
-  console.log("Select Bank");
-  console.log("================================");
-  console.log("1) STANCHART");
-  console.log("2) ABSA");
-  console.log("3) GCB");
-  console.log("4) FIDELITY");
-  console.log("5) CAL");
-  console.log("6) ADB");
-  console.log("7) ECOBANK");
-  console.log("================================\n");
-  
-  option = prompt("Select Bank\n1) STANCHART\n2) ABSA\n3) GCB\n4) FIDELITY\n5) CAL\n6) ADB\n7) ECOBANK");
-  
-  console.clear();
-  
-  const banks = ["STANCHART", "ABSA", "GCB", "FIDELITY", "CAL", "ADB", "ECOBANK"];
-  
-  if (option >= "1" && option <= "7") {
-    processBankToWalletTransfer(banks[parseInt(option) - 1]);
-  } else {
-    console.log("Unknown Input");
-    setTimeout(bankToWallet, 2000);
-  }
+  currentAction = "bankToWallet";
+  showStatus("Select Bank", ["Choose the bank account to withdraw from."]);
+  renderMenu([
+    { label: "STANCHART", action: "selectBankToWalletStanchart" },
+    { label: "ABSA", action: "selectBankToWalletAbsa" },
+    { label: "GCB", action: "selectBankToWalletGcb" },
+    { label: "FIDELITY", action: "selectBankToWalletFidelity" },
+    { label: "CAL", action: "selectBankToWalletCal" },
+    { label: "ADB", action: "selectBankToWalletAdb" },
+    { label: "ECOBANK", action: "selectBankToWalletEcobank" },
+  ]);
+  ui.fields.innerHTML = "";
+}
+
+function selectBankToWalletStanchart() {
+  processBankToWalletTransfer("STANCHART");
+}
+function selectBankToWalletAbsa() {
+  processBankToWalletTransfer("ABSA");
+}
+function selectBankToWalletGcb() {
+  processBankToWalletTransfer("GCB");
+}
+function selectBankToWalletFidelity() {
+  processBankToWalletTransfer("FIDELITY");
+}
+function selectBankToWalletCal() {
+  processBankToWalletTransfer("CAL");
+}
+function selectBankToWalletAdb() {
+  processBankToWalletTransfer("ADB");
+}
+function selectBankToWalletEcobank() {
+  processBankToWalletTransfer("ECOBANK");
 }
 
 function processBankToWalletTransfer(bank) {
-  console.log("================================");
-  console.log(`${bank} - Bank to Wallet Transfer`);
-  console.log("================================\n");
-  
-  const amount = prompt("Enter Amount to Transfer:");
-  const referens = prompt("Enter Reference ID:");
-  
-  console.clear();
-  const amtNum = parseFloat(amount);
-  const feeAmt = amtNum * 0.007;
-  const taxAmt = amtNum * 0.01;
-  const totalAmt = amtNum + feeAmt + taxAmt;
-  console.log("================================");
-  console.log("Withdrawal Confirmation");
-  console.log("================================");
-  console.log("Dear HAYFORD ASANTE ADDE, please");
-  console.log("confirm you want to complete your");
-  console.log(`withdrawal request for GHC ${amtNum.toFixed(2)} from`);
-  console.log(`${bank}, account name-, account`);
-  console.log(`Fee is GHC ${feeAmt.toFixed(2)}`);
-  console.log(`Tax amount is GHC ${taxAmt.toFixed(2)}`);
-  console.log("================================\n");
-  
-  const next = prompt("Enter PIN (MM) to confirm:");
-  
-  console.clear();
-  if (next !== '1234') {
-    console.log("================================");
-    console.log("Incorrect PIN");
-    console.log("================================\n");
-    showMenu();
+  renderForm(
+    `${bank} Transfer`,
+    [
+      {
+        label: "Enter Amount to Transfer",
+        name: "amount",
+        type: "number",
+        step: "0.01",
+      },
+      { label: "Enter Reference ID", name: "reference", type: "text" },
+      { label: "Enter PIN (MM) to confirm", name: "pin", type: "password" },
+    ],
+    "bankToWalletTransfer",
+  );
+  currentAction = "bankToWalletTransfer";
+  showStatus(`${bank} - Bank to Wallet Transfer`, [
+    "Enter the transfer details below.",
+  ]);
+  ui.form.dataset.bank = bank;
+}
+
+function handleBankToWalletTransfer(data) {
+  const bank = ui.form.dataset.bank || "Selected Bank";
+  const amount = parseFloat(data.amount);
+  if (!amount || amount <= 0) {
+    showStatus(
+      "Invalid Amount",
+      ["Please enter a valid amount greater than zero."],
+      "error",
+    );
     return;
   }
-  
-  // Check if total debit (amount+fee+tax) exceeds current bank balance
+  if (data.pin !== "1234") {
+    showStatus("Incorrect PIN", ["The PIN you entered is incorrect."], "error");
+    return;
+  }
+
+  const feeAmt = amount * 0.007;
+  const taxAmt = amount * 0.01;
+  const totalAmt = amount + feeAmt + taxAmt;
   if (totalAmt > bankBalance) {
-    console.log("================================");
-    console.log("Insufficient Bank Balance");
-    console.log("You have insufficient funds in your bank account");
-    console.log("================================");
-    console.log(`Bank Balance: GHC ${bankBalance.toFixed(2)}`);
-    console.log(`Required Amount (incl. fees/tax): GHC ${totalAmt.toFixed(2)}`);
-    console.log("================================\n");
-    showMenu();
+    showStatus(
+      "Insufficient Bank Balance",
+      [
+        `Your bank balance is GHC ${bankBalance.toFixed(2)}`,
+        `The transfer needs GHC ${totalAmt.toFixed(2)}`,
+      ],
+      "error",
+    );
     return;
   }
-  
+
   bankBalance -= totalAmt;
   balance += totalAmt;
+  updateBalances();
   const txnId = Math.floor(Math.random() * 1000000);
-  promptResult(
-    "Account Statement",
+  showStatus(
+    "✓ Transaction Successful",
     [
-      "Acct: 1*******4582",
-      `Amt: GHC ${amount} CR`,
-      "Desc: GHC 100",
-      "14375983857:Int.PD:01-08-2025",
-      "to 29-08-2025",
+      `You have transferred GHC ${amount.toFixed(2)} from ${bank} to your wallet.`,
+      `Fee: GHC ${feeAmt.toFixed(2)}`,
+      `Tax: GHC ${taxAmt.toFixed(2)}`,
       `Mobile Balance: GHC ${balance.toFixed(2)}`,
       `Bank Balance: GHC ${bankBalance.toFixed(2)}`,
-      "Date: 2025-08-29 10:51:46 PM",
-      `Transaction ID: ${txnId}`
-    ]
+      `Transaction ID: ${txnId}`,
+    ],
+    "success",
   );
-  
-  showMenu();
+  renderMenu([
+    { label: "Back to Transfer Menu", action: "moneyTransfer" },
+    { label: "Back to Main Menu", action: "main" },
+  ]);
 }
 
 function seven() {
-  console.clear();
-  console.log("================================");
-  console.log("Option 7");
-  console.log("================================");
-  console.log("This option is under development");
-  console.log("================================\n");
-  
-  showMenu();
+  showStatus("Option 7", ["This option is still under development."], "info");
+  ui.fields.innerHTML = "";
+  renderMenu([
+    { label: "Back to Transfer Menu", action: "moneyTransfer" },
+    { label: "Back to Main Menu", action: "main" },
+  ]);
+}
+
+function showComingSoon() {
+  showStatus("Coming Soon", ["This option is not available yet."], "info");
+  ui.fields.innerHTML = "";
+  renderMenu([{ label: "Back to Main Menu", action: "main" }]);
 }
 
 function showMenu() {
-  const continueChoice = prompt("1) Menu  2) Exit");
-  
-  if (continueChoice === "1") {
-    moneyTransfer();
-  } else if (continueChoice === "2") {
-    console.clear();
-    console.log("================================");
-    console.log("System Exit");
-    console.log("Thank you for using MoMo App!");
-    console.log("================================");
-  } else {
-    moneyTransfer();
-  }
+  renderMenu([
+    { label: "Back to Transfer Menu", action: "moneyTransfer" },
+    { label: "Back to Main Menu", action: "main" },
+  ]);
 }
 
-// Start the application
-console.clear();
-console.log("================================");
-console.log("Welcome to MoMo Money Transfer App");
-console.log("================================\n");
-momoUser();
-
-
+init();

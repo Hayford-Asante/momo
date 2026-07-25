@@ -1,97 +1,152 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MoMo Money Transfer - Browser Console</title>
+    <title>MoMo Money Transfer App</title>
     <style>
         body {
             font-family: Arial, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
+            margin: 0;
             display: flex;
             justify-content: center;
             align-items: center;
-            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
         }
-        
+
         .container {
             background: white;
-            border-radius: 10px;
-            padding: 40px;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
-            text-align: center;
-            max-width: 600px;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.25);
+            width: min(680px, 100%);
         }
-        
-        h1 {
-            color: #333;
-            margin-bottom: 10px;
-        }
-        
+
         .logo {
-            font-size: 48px;
-            margin-bottom: 20px;
+            font-size: 42px;
+            text-align: center;
+            margin-bottom: 8px;
         }
-        
-        p {
+
+        h1 {
+            margin: 0 0 8px;
+            color: #333;
+            text-align: center;
+        }
+
+        .subtitle {
+            text-align: center;
             color: #666;
-            font-size: 16px;
-            line-height: 1.6;
-            margin: 15px 0;
+            margin: 0 0 16px;
         }
-        
-        .instructions {
-            background: #f0f4ff;
-            border-left: 4px solid #667eea;
-            padding: 15px;
-            border-radius: 5px;
-            text-align: left;
-            margin: 20px 0;
+
+        .balance-card {
+            background: #f2f6ff;
+            border: 1px solid #dce7ff;
+            border-radius: 8px;
+            padding: 12px 16px;
+            margin-bottom: 12px;
+            display: flex;
+            justify-content: space-between;
+            gap: 16px;
+            font-weight: 600;
+            color: #354a70;
         }
-        
-        .instructions h3 {
-            margin-top: 0;
-            color: #667eea;
+
+        .status-card {
+            padding: 14px;
+            border-radius: 8px;
+            margin-bottom: 12px;
+            border: 1px solid #dce7ff;
+            background: #f9fbff;
         }
-        
-        .instructions ol {
-            margin: 10px 0;
-            padding-left: 20px;
+
+        .status-card h3 {
+            margin: 0 0 8px;
+            color: #333;
         }
-        
-        .instructions li {
-            margin: 8px 0;
+
+        .status-card ul {
+            margin: 0;
+            padding-left: 18px;
             color: #555;
         }
-        
-        button {
+
+        .status-card.success {
+            background: #f3fff7;
+            border-color: #bcf1cf;
+        }
+
+        .status-card.error {
+            background: #fff5f5;
+            border-color: #ffd3d3;
+        }
+
+        .menu {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+
+        .menu-btn,
+        button[type="submit"],
+        button[type="button"] {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             border: none;
-            padding: 12px 30px;
-            font-size: 16px;
-            border-radius: 5px;
+            padding: 10px 12px;
+            border-radius: 6px;
             cursor: pointer;
-            transition: transform 0.2s;
-            margin-top: 20px;
+            font-size: 14px;
         }
-        
+
+        .menu-btn:hover,
         button:hover {
-            transform: scale(1.05);
+            transform: translateY(-1px);
         }
-        
-        .code {
-            background: #f4f4f4;
-            padding: 8px 12px;
-            border-radius: 3px;
-            font-family: monospace;
-            color: #d63384;
+
+        form {
+            background: #fbfcff;
+            border: 1px solid #e6ebf7;
+            border-radius: 8px;
+            padding: 12px;
         }
-        
+
+        form h3 {
+            margin-top: 0;
+            color: #333;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 10px;
+            font-size: 14px;
+            color: #555;
+        }
+
+        input {
+            width: 100%;
+            padding: 8px 10px;
+            margin-top: 4px;
+            border: 1px solid #d7dceb;
+            border-radius: 6px;
+            box-sizing: border-box;
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 8px;
+        }
+
         .footer {
-            margin-top: 30px;
-            color: #999;
+            text-align: center;
+            color: #888;
+            margin-top: 10px;
             font-size: 12px;
         }
     </style>
@@ -100,42 +155,27 @@
     <div class="container">
         <div class="logo">💰</div>
         <h1>MoMo Money Transfer App</h1>
-        <p>Browser Console Version</p>
-        
-       
+        <p class="subtitle">Interactive browser experience</p>
 
-
-         <div class="instructions">
-            <h3>More offers await on the MoMo App</h3>
-            <ol>
-  <li>("1) MoMo User</li>
-  <li>("2) Non MoMo User</li>
-  <li>("3) Send with care</li>
-  <li>("4) Favorite</li>
-  <li>("5) Other Network</li>
-  <li>("6) Bank Account</li>
-  
-                           </ol>
+        <div class="balance-card">
+            <span>Mobile Wallet: <strong id="mobile-balance">GHC 0.00</strong></span>
+            <span>Bank Balance: <strong id="bank-balance">GHC 0.00</strong></span>
         </div>
 
-         <div class="instructions">
-            <h3>How to Use:</h3>
-            <ol>
-                <li>Dial *170*1# to start your transaction<span class="code"></span></li>
-                <li>Your momo pin is 1234</li>
-                <li>Remember you've got GHS 1000 in your account</li>
-                           </ol>
-        </div>
-        
-    
+        <div id="status"></div>
+        <div id="menu" class="menu"></div>
+
+        <form id="action-form">
+            <div id="form-fields"></div>
+            <div class="form-actions">
+                <button type="submit" id="submit-btn">Continue</button>
+                <button type="button" id="back-btn">Back</button>
+            </div>
+        </form>
+
+        <p class="footer">Use the on-screen buttons and forms instead of the browser console.</p>
     </div>
-    
+
     <script src="momo.js"></script>
-    
-    <script>
-        function openConsole() {
-            alert("Press F12 to open the Developer Console and check the Console tab!");
-        }
-    </script>
 </body>
 </html>
