@@ -10,6 +10,7 @@ const ui = {
   backButton: document.getElementById("back-btn"),
   mobileBalance: document.getElementById("mobile-balance"),
   bankBalance: document.getElementById("bank-balance"),
+  footer: document.querySelector(".footer"),
 };
 
 let currentAction = null;
@@ -32,17 +33,50 @@ function updateBalances() {
   ui.bankBalance.textContent = `GHC ${bankBalance.toFixed(2)}`;
 }
 
-function showStatus(title, details, type = "info") {
-  const detailItems = details.map((detail) => `<li>${detail}</li>`).join("");
+function showStatus(title, details = [], type = "info") {
+  const detailItems =
+    Array.isArray(details) && details.length
+      ? `<ul>${details.map((detail) => `<li>${detail}</li>`).join("")}</ul>`
+      : "";
   ui.status.innerHTML = `
     <div class="status-card ${type}">
       <h3>${title}</h3>
-      <ul>${detailItems}</ul>
+      ${detailItems}
     </div>
   `;
 }
 
+function hideFormAndMenu() {
+  ui.menu.innerHTML = "";
+  ui.form.classList.add("hidden");
+}
+
+function showPinErrorRestart() {
+  ui.menu.innerHTML = "";
+  ui.form.classList.add("hidden");
+  if (ui.footer) {
+    ui.footer.classList.add("hidden");
+  }
+  showStatus("Incorrect PIN", ["The PIN you entered is incorrect."], "error");
+  renderMenu([{ label: "Continue", action: "main" }]);
+}
+
+function resetActionButtons() {
+  ui.form.classList.remove("hidden");
+  if (ui.footer) {
+    ui.footer.classList.remove("hidden");
+  }
+  const actions = ui.form.querySelector(".form-actions");
+  if (actions) {
+    actions.style.display = "flex";
+  }
+}
+
 function renderMenu(buttons) {
+  ui.menu.classList.remove("hidden");
+  if (ui.footer) {
+    ui.footer.classList.remove("hidden");
+  }
   ui.menu.innerHTML = buttons
     .map(
       (button) => `
@@ -62,6 +96,8 @@ function renderMenu(buttons) {
 }
 
 function renderForm(title, fields, actionName, submitLabel = "Continue") {
+  ui.menu.classList.add("hidden");
+  resetActionButtons();
   currentAction = actionName || "custom";
   ui.form.dataset.active = currentAction;
   ui.submitButton.textContent = submitLabel;
@@ -102,13 +138,7 @@ function handleFormSubmit(event) {
 
 function main() {
   currentAction = "main";
-  showStatus("Unlock more deals, try our new MoMo App", [
-    "Transfer Money",
-    "MoMoPay & Pay Bill",
-    "Airtime & Bundles",
-    "Allow cash out",
-    "Financial",
-  ]);
+  showStatus("Welcome to the MoMo App");
   renderMenu([
     { label: "Transfer Money", action: "moneyTransfer" },
     { label: "MoMoPay & Pay Bill", action: "showComingSoon" },
@@ -121,15 +151,7 @@ function main() {
 
 function moneyTransfer() {
   currentAction = "moneyTransfer";
-  showStatus("More offers await on the MoMo App", [
-    "MoMo User",
-    "Non MoMo User",
-    "Send with care",
-    "Favorite",
-    "Other Network",
-    "Bank Account",
-    "Seven",
-  ]);
+  showStatus("Transfer Money");
   renderMenu([
     { label: "MoMo User", action: "momoUserTransfer" },
     { label: "Non MoMo User", action: "nonMomouser" },
@@ -137,7 +159,6 @@ function moneyTransfer() {
     { label: "Favorite", action: "favourite" },
     { label: "Other Network", action: "otherNetwork" },
     { label: "Bank Account", action: "bank" },
-    { label: "Seven", action: "seven" },
   ]);
   ui.fields.innerHTML = "";
 }
@@ -154,13 +175,11 @@ function momoUserTransfer() {
         step: "0.01",
       },
       { label: "Enter Reference", name: "reference", type: "text" },
-      { label: "Enter PIN (MM) to confirm", name: "pin", type: "password" },
+      { label: "Enter PIN (MM) to confirm", name: "pin", type: "text" },
     ],
     "momoUserTransfer",
   );
-  showStatus("MoMo User Transfer", [
-    "Please enter the transfer details below.",
-  ]);
+  showStatus("MoMo User Transfer");
 }
 
 function handleMomoTransfer(data) {
@@ -175,7 +194,7 @@ function handleMomoTransfer(data) {
   }
 
   if (data.pin !== "1234") {
-    showStatus("Incorrect PIN", ["The PIN you entered is incorrect."], "error");
+    showPinErrorRestart();
     return;
   }
 
@@ -185,7 +204,7 @@ function handleMomoTransfer(data) {
 
   if (totalAmt > balance) {
     showStatus(
-      "Insufficient Balance",
+      "Insufficient balance in your account",
       [
         `Your mobile wallet balance is GHC ${balance.toFixed(2)}`,
         `The transfer needs GHC ${totalAmt.toFixed(2)}`,
@@ -202,6 +221,7 @@ function handleMomoTransfer(data) {
     "✓ Transaction Successful",
     [
       `You have sent GHC ${amount.toFixed(2)} to HAYFORD ASANTE ADDE.`,
+      `Reference: ${data.reference || "N/A"}`,
       `Fee: GHC ${feeAmt.toFixed(2)}`,
       `Tax: GHC ${taxAmt.toFixed(2)}`,
       `Your balance is GHC ${balance.toFixed(2)}`,
@@ -209,10 +229,8 @@ function handleMomoTransfer(data) {
     ],
     "success",
   );
-  renderMenu([
-    { label: "Back to Transfer Menu", action: "moneyTransfer" },
-    { label: "Back to Main Menu", action: "main" },
-  ]);
+  hideFormAndMenu();
+  renderMenu([{ label: "Continue", action: "main" }]);
 }
 
 function nonMomouser() {
@@ -224,13 +242,11 @@ function nonMomouser() {
       { label: "Enter Reference", name: "reference", type: "text" },
       { label: "Enter Secret Code", name: "secretCode1", type: "password" },
       { label: "Confirm Secret Code", name: "secretCode2", type: "password" },
-      { label: "Enter PIN (MM) to confirm", name: "pin", type: "password" },
+      { label: "Enter PIN (MM) to confirm", name: "pin", type: "text" },
     ],
     "nonMomouser",
   );
-  showStatus("Non MoMo User Transfer", [
-    "Please fill in the details to continue.",
-  ]);
+  showStatus("Non MoMo User Transfer");
 }
 
 function handleNonMomoTransfer(data) {
@@ -250,13 +266,25 @@ function handleNonMomoTransfer(data) {
   }
 
   if (data.pin !== "1234") {
-    showStatus("Incorrect PIN", ["The PIN you entered is incorrect."], "error");
+    showPinErrorRestart();
     return;
   }
 
   const feeAmt = amount * 0.007;
   const taxAmt = amount * 0.01;
   const totalAmt = amount + feeAmt + taxAmt;
+  if (totalAmt > balance) {
+    showStatus(
+      "Insufficient balance in your account",
+      [
+        `Your mobile wallet balance is GHC ${balance.toFixed(2)}`,
+        `The transfer needs GHC ${totalAmt.toFixed(2)}`,
+      ],
+      "error",
+    );
+    return;
+  }
+
   balance -= totalAmt;
   updateBalances();
   const txnId = Math.floor(Math.random() * 1000000);
@@ -264,6 +292,7 @@ function handleNonMomoTransfer(data) {
     "✓ Transaction Successful",
     [
       `You have sent GHC ${amount.toFixed(2)} to ${data.name}.`,
+      `Reference: ${data.reference || "N/A"}`,
       `Fee: GHC ${feeAmt.toFixed(2)}`,
       `Tax: GHC ${taxAmt.toFixed(2)}`,
       `Your balance is GHC ${balance.toFixed(2)}`,
@@ -271,10 +300,8 @@ function handleNonMomoTransfer(data) {
     ],
     "success",
   );
-  renderMenu([
-    { label: "Back to Transfer Menu", action: "moneyTransfer" },
-    { label: "Back to Main Menu", action: "main" },
-  ]);
+  hideFormAndMenu();
+  renderMenu([{ label: "Continue", action: "main" }]);
 }
 
 function sendWithcare() {
@@ -298,16 +325,16 @@ function favourite() {
     "Favourite Contacts",
     [
       { label: "Enter Name", name: "name", type: "text" },
-      { label: "Enter PIN", name: "pin", type: "password" },
+      { label: "Enter PIN", name: "pin", type: "text" },
     ],
     "favourite",
   );
-  showStatus("Favourite Contacts", ["Enter a name and PIN to search."]);
+  showStatus("Favourite Contacts");
 }
 
 function handleFavourite(data) {
   if (data.pin !== "1234") {
-    showStatus("Incorrect PIN", ["The PIN you entered is incorrect."], "error");
+    showPinErrorRestart();
     return;
   }
   showStatus(
@@ -323,7 +350,7 @@ function handleFavourite(data) {
 
 function otherNetwork() {
   currentAction = "otherNetwork";
-  showStatus("Transfer Money To Other Network", ["Choose a network below."]);
+  showStatus("Transfer Money To Other Network");
   renderMenu([
     { label: "AT", action: "selectNetworkAT" },
     { label: "Telecel", action: "selectNetworkTelecel" },
@@ -367,12 +394,12 @@ function processOtherNetworkTransfer(network) {
         step: "0.01",
       },
       { label: "Enter Reference", name: "reference", type: "text" },
-      { label: "Enter PIN (MM) to confirm", name: "pin", type: "password" },
+      { label: "Enter PIN (MM) to confirm", name: "pin", type: "text" },
     ],
     "otherNetworkTransfer",
   );
   currentAction = "otherNetworkTransfer";
-  showStatus(`${network} Transfer`, ["Enter the transfer details below."]);
+  showStatus(`${network} Transfer`);
   ui.form.dataset.network = network;
 }
 
@@ -389,13 +416,25 @@ function handleOtherNetworkTransfer(data) {
   }
 
   if (data.pin !== "1234") {
-    showStatus("Incorrect PIN", ["The PIN you entered is incorrect."], "error");
+    showPinErrorRestart();
     return;
   }
 
   const feeAmt = amount * 0.007;
   const taxAmt = amount * 0.01;
   const totalAmt = amount + feeAmt + taxAmt;
+  if (totalAmt > balance) {
+    showStatus(
+      "Insufficient balance in your account",
+      [
+        `Your mobile wallet balance is GHC ${balance.toFixed(2)}`,
+        `The transfer needs GHC ${totalAmt.toFixed(2)}`,
+      ],
+      "error",
+    );
+    return;
+  }
+
   balance -= totalAmt;
   updateBalances();
   const txnId = Math.floor(Math.random() * 1000000);
@@ -403,6 +442,7 @@ function handleOtherNetworkTransfer(data) {
     "✓ Transaction Successful",
     [
       `You have sent GHC ${amount.toFixed(2)} to HAYFORD ASANTE ADDE via ${network}.`,
+      `Reference: ${data.reference || "N/A"}`,
       `Fee: GHC ${feeAmt.toFixed(2)}`,
       `Tax: GHC ${taxAmt.toFixed(2)}`,
       `Your balance is GHC ${balance.toFixed(2)}`,
@@ -410,10 +450,8 @@ function handleOtherNetworkTransfer(data) {
     ],
     "success",
   );
-  renderMenu([
-    { label: "Back to Transfer Menu", action: "moneyTransfer" },
-    { label: "Back to Main Menu", action: "main" },
-  ]);
+  hideFormAndMenu();
+  renderMenu([{ label: "Continue", action: "main" }]);
 }
 
 function bank() {
@@ -430,7 +468,7 @@ function bank() {
 
 function walletToBank() {
   currentAction = "walletToBank";
-  showStatus("Select Bank", ["Choose your bank below."]);
+  showStatus("Select Bank");
   renderMenu([
     { label: "STANCHART", action: "selectBankStanchart" },
     { label: "ABSA", action: "selectBankAbsa" },
@@ -481,14 +519,12 @@ function processWalletToBankTransfer(bank) {
         step: "0.01",
       },
       { label: "Enter Reference ID", name: "reference", type: "text" },
-      { label: "Enter PIN (MM) to confirm", name: "pin", type: "password" },
+      { label: "Enter PIN (MM) to confirm", name: "pin", type: "text" },
     ],
     "walletToBankTransfer",
   );
   currentAction = "walletToBankTransfer";
-  showStatus(`${bank} - Wallet to Bank Transfer`, [
-    "Enter your bank transfer details below.",
-  ]);
+  showStatus(`${bank} - Wallet to Bank Transfer`);
   ui.form.dataset.bank = bank;
 }
 
@@ -504,7 +540,7 @@ function handleWalletToBankTransfer(data) {
     return;
   }
   if (data.pin !== "1234") {
-    showStatus("Incorrect PIN", ["The PIN you entered is incorrect."], "error");
+    showPinErrorRestart();
     return;
   }
 
@@ -513,7 +549,7 @@ function handleWalletToBankTransfer(data) {
   const totalAmt = amount + feeAmt + taxAmt;
   if (totalAmt > balance) {
     showStatus(
-      "Insufficient Balance",
+      "Insufficient balance in your account",
       [
         `Your mobile wallet balance is GHC ${balance.toFixed(2)}`,
         `The transfer needs GHC ${totalAmt.toFixed(2)}`,
@@ -531,6 +567,7 @@ function handleWalletToBankTransfer(data) {
     "✓ Transaction Successful",
     [
       `You have transferred GHC ${amount.toFixed(2)} to your bank account.`,
+      `Reference: ${data.reference || "N/A"}`,
       `Bank: ${bank}`,
       `Fee: GHC ${feeAmt.toFixed(2)}`,
       `Tax: GHC ${taxAmt.toFixed(2)}`,
@@ -540,15 +577,13 @@ function handleWalletToBankTransfer(data) {
     ],
     "success",
   );
-  renderMenu([
-    { label: "Back to Transfer Menu", action: "moneyTransfer" },
-    { label: "Back to Main Menu", action: "main" },
-  ]);
+  hideFormAndMenu();
+  renderMenu([{ label: "Continue", action: "main" }]);
 }
 
 function bankToWallet() {
   currentAction = "bankToWallet";
-  showStatus("Select Bank", ["Choose the bank account to withdraw from."]);
+  showStatus("Select Bank");
   renderMenu([
     { label: "STANCHART", action: "selectBankToWalletStanchart" },
     { label: "ABSA", action: "selectBankToWalletAbsa" },
@@ -594,14 +629,12 @@ function processBankToWalletTransfer(bank) {
         step: "0.01",
       },
       { label: "Enter Reference ID", name: "reference", type: "text" },
-      { label: "Enter PIN (MM) to confirm", name: "pin", type: "password" },
+      { label: "Enter PIN (MM) to confirm", name: "pin", type: "text" },
     ],
     "bankToWalletTransfer",
   );
   currentAction = "bankToWalletTransfer";
-  showStatus(`${bank} - Bank to Wallet Transfer`, [
-    "Enter the transfer details below.",
-  ]);
+  showStatus(`${bank} - Bank to Wallet Transfer`);
   ui.form.dataset.bank = bank;
 }
 
@@ -617,7 +650,7 @@ function handleBankToWalletTransfer(data) {
     return;
   }
   if (data.pin !== "1234") {
-    showStatus("Incorrect PIN", ["The PIN you entered is incorrect."], "error");
+    showPinErrorRestart();
     return;
   }
 
@@ -644,6 +677,7 @@ function handleBankToWalletTransfer(data) {
     "✓ Transaction Successful",
     [
       `You have transferred GHC ${amount.toFixed(2)} from ${bank} to your wallet.`,
+      `Reference: ${data.reference || "N/A"}`,
       `Fee: GHC ${feeAmt.toFixed(2)}`,
       `Tax: GHC ${taxAmt.toFixed(2)}`,
       `Mobile Balance: GHC ${balance.toFixed(2)}`,
@@ -652,10 +686,8 @@ function handleBankToWalletTransfer(data) {
     ],
     "success",
   );
-  renderMenu([
-    { label: "Back to Transfer Menu", action: "moneyTransfer" },
-    { label: "Back to Main Menu", action: "main" },
-  ]);
+  hideFormAndMenu();
+  renderMenu([{ label: "Continue", action: "main" }]);
 }
 
 function seven() {
